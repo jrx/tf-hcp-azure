@@ -1,3 +1,19 @@
+provider "azurerm" {
+  features {}
+
+  subscription_id = var.subscription_id
+  tenant_id       = var.tenant_id
+}
+
+resource "azurerm_resource_group" "vault" {
+  name     = "${var.environment}-hcp-rg"
+  location = var.location
+
+  tags = {
+    environment = var.environment
+  }
+}
+
 resource "random_id" "name" {
   byte_length = 4
 }
@@ -29,10 +45,6 @@ resource "azurerm_public_ip" "tf_publicip" {
   tags = {
     environment = "${var.environment}-${random_id.name.hex}"
   }
-}
-
-locals {
-  hvn_dir = "172.26.16.0/20"
 }
 
 resource "azurerm_network_security_group" "tf_nsg" {
@@ -87,7 +99,7 @@ resource "azurerm_network_security_group" "tf_nsg" {
     name                       = "ConsulServerInbound"
     priority                   = 400
     source_port_range          = "*"
-    source_address_prefix      = local.hvn_dir
+    source_address_prefix      = var.cidr_block
     destination_address_prefix = "VirtualNetwork"
     destination_port_range     = "8301"
     direction                  = "Inbound"
@@ -117,7 +129,7 @@ resource "azurerm_network_security_group" "tf_nsg" {
     priority                   = 400
     source_port_range          = "*"
     source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = local.hvn_dir
+    destination_address_prefix = var.cidr_block
     destination_port_range     = "8300-8301"
     direction                  = "Outbound"
     access                     = "Allow"
@@ -141,7 +153,7 @@ resource "azurerm_network_security_group" "tf_nsg" {
     priority                   = 402
     source_port_range          = "*"
     source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = local.hvn_dir
+    destination_address_prefix = var.cidr_block
     destination_port_range     = "80"
     direction                  = "Outbound"
     access                     = "Allow"
@@ -153,7 +165,7 @@ resource "azurerm_network_security_group" "tf_nsg" {
     priority                   = 403
     source_port_range          = "*"
     source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = local.hvn_dir
+    destination_address_prefix = var.cidr_block
     destination_port_range     = "443"
     direction                  = "Outbound"
     access                     = "Allow"
@@ -165,7 +177,7 @@ resource "azurerm_network_security_group" "tf_nsg" {
     priority                   = 404
     source_port_range          = "*"
     source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = local.hvn_dir
+    destination_address_prefix = var.cidr_block
     destination_port_range     = "8502"
     direction                  = "Outbound"
     access                     = "Allow"
@@ -179,7 +191,7 @@ resource "azurerm_network_security_group" "tf_nsg" {
     priority                   = 410
     source_port_range          = "*"
     source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = local.hvn_dir
+    destination_address_prefix = var.cidr_block
     destination_port_range     = "8200"
     direction                  = "Outbound"
     access                     = "Allow"
@@ -215,22 +227,42 @@ resource "azurerm_network_interface_security_group_association" "tf_nisga" {
 
 ## HCP Peering
 
-locals {
-  application_id = "52512bbe-4923-4ac7-be7c-d8d2044b820a"
-  role_def_name  = join("-", ["hcp-hvn-peering-access", local.application_id])
-  vnet_id        = "/subscriptions/${var.subscription_id}/resourceGroups/${azurerm_resource_group.vault.name}/providers/Microsoft.Network/virtualNetworks/${azurerm_virtual_network.tf_network.name}"
+resource "hcp_azure_peering_connection" "peer" {
+  hvn_link                 = hcp_hvn.example_hvn.self_link
+  peering_id               = "peering-azure-dev"
+  peer_vnet_name           = azurerm_virtual_network.tf_network.name
+  peer_subscription_id     = var.subscription_id
+  peer_tenant_id           = var.tenant_id
+  peer_resource_group_name = azurerm_resource_group.vault.name
+  peer_vnet_region         = azurerm_virtual_network.tf_network.location
+}
+
+data "hcp_azure_peering_connection" "peer" {
+  hvn_link              = hcp_hvn.example_hvn.self_link
+  peering_id            = hcp_azure_peering_connection.peer.peering_id
+  wait_for_active_state = true
+  depends_on = [
+    azurerm_role_assignment.role_assignment
+  ]
+}
+
+resource "hcp_hvn_route" "route" {
+  hvn_link         = hcp_hvn.example_hvn.self_link
+  hvn_route_id     = "route-azure-dev"
+  destination_cidr = "10.0.0.0/16"
+  target_link      = data.hcp_azure_peering_connection.peer.self_link
 }
 
 resource "azuread_service_principal" "principal" {
-  application_id = local.application_id
+  application_id = hcp_azure_peering_connection.peer.application_id
 }
 
 resource "azurerm_role_definition" "definition" {
-  name  = local.role_def_name
-  scope = local.vnet_id
+  name  = "hcp-hvn-peering-access-${random_id.name.hex}"
+  scope = azurerm_virtual_network.tf_network.id
 
   assignable_scopes = [
-    local.vnet_id
+    azurerm_virtual_network.tf_network.id
   ]
 
   permissions {
@@ -245,5 +277,5 @@ resource "azurerm_role_definition" "definition" {
 resource "azurerm_role_assignment" "role_assignment" {
   principal_id       = azuread_service_principal.principal.id
   role_definition_id = azurerm_role_definition.definition.role_definition_resource_id
-  scope              = local.vnet_id
+  scope              = azurerm_virtual_network.tf_network.id
 }

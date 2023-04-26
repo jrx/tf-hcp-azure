@@ -13,7 +13,7 @@ ip_address="$(ip addr show eth0 | perl -n -e'/ inet (\d+(\.\d+)+)/ && print $1')
 # NB execute `apt-cache madison vault` to known the available versions.
 curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
 apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-apt-get install -y "vault-enterprise=${vault_version}" jq
+apt-get install -y "vault-enterprise=${vault_client_version}" jq
 
 systemctl disable vault
 systemctl stop vault

@@ -24,7 +24,7 @@ data "template_file" "setup" {
   template = file("${path.module}/setup.tpl")
 
   vars = {
-    vault_version = var.vault_version
+    vault_client_version = var.vault_client_version
   }
 }
 
@@ -58,8 +58,8 @@ resource "azurerm_linux_virtual_machine" "tf_vm" {
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
+    offer     = "0001-com-ubuntu-server-jammy" # "UbuntuServer"
+    sku       = "22_04-lts-gen2"               # "18.04-LTS"
     version   = "latest"
   }
 

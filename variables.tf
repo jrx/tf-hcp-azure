@@ -1,44 +1,73 @@
-# ---------------------------
-# Azure Key Vault
-# ---------------------------
+# HCP 
+
+variable "hcp_client_id" {}
+variable "hcp_client_secret" {}
+variable "hvn_id" {
+  description = "The ID of the HCP HVN."
+  type        = string
+  default     = "hvn-azure-test"
+}
+variable "region" {
+  description = "The region of the HCP HVN and Vault cluster."
+  type        = string
+  default     = "westeurope"
+}
+variable "cloud_provider" {
+  description = "The cloud provider of the HCP HVN and Vault cluster."
+  type        = string
+  default     = "azure"
+}
+variable "cidr_block" {
+  description = "The CIDR range of the HVN."
+  type        = string
+  default     = "172.26.16.0/20"
+}
+
+# Vault
+
+variable "vault_enabled" {
+  type        = bool
+  description = "Deploy the HCP Vault"
+  default     = false
+}
+variable "vault_cluster_id" {
+  description = "The ID of the HCP Vault cluster."
+  type        = string
+  default     = "test-hcp-vault"
+}
+variable "min_vault_version" {
+  description = "The minimum Vault version of the cluster."
+  type        = string
+  default     = ""
+}
+variable "vault_public_endpoint" {
+  type        = bool
+  description = "Deploy with Public DNS Endpoint."
+  default     = false
+}
+
+# Azure
+
 variable "tenant_id" {
   default = ""
 }
-
-variable "key_name" {
-  description = "Azure Key Vault key name"
-  default     = "generated-key"
-}
-
-variable "location" {
-  description = "Azure location where the Key Vault resource to be created"
-  default     = "eastus"
-}
-
-variable "environment" {
-  default = "learn"
-}
-
-# ---------------------------
-# Virtual Machine
-# ---------------------------
-variable "public_key" {
-  default = ""
-}
-
 variable "subscription_id" {
   default = ""
 }
-
-variable "vm_name" {
-  default = "azure-auth-demo-vm"
+variable "location" {
+  description = "Azure location where the Key Vault resource to be created"
+  default     = "westeurope"
 }
-
-variable "vault_version" {
+variable "environment" {
+  default = "dev"
+}
+variable "vault_client_version" {
   # NB execute `apt-cache madison vault` to known the available versions.
   default = "1.9.4"
 }
-
-variable "resource_group_name" {
-  default = "vault-demo-azure-auth"
+variable "public_key" {
+  default = ""
+}
+variable "vm_name" {
+  default = "demo-vm"
 }
