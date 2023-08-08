@@ -40,6 +40,11 @@ variable "min_vault_version" {
   type        = string
   default     = ""
 }
+variable "vault_tier" {
+  description = "Tier of the HCP Vault cluster."
+  type        = string
+  default     = "plus_small"
+}
 variable "vault_public_endpoint" {
   type        = bool
   description = "Deploy with Public DNS Endpoint."

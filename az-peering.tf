@@ -68,121 +68,121 @@ resource "azurerm_network_security_group" "tf_nsg" {
 
   # Legacy
 
-  security_rule {
-    name                       = "Vault"
-    priority                   = 1002
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "8200"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # security_rule {
+  #   name                       = "Vault"
+  #   priority                   = 1002
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "8200"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
-  security_rule {
-    name                       = "Consul"
-    priority                   = 1003
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "8500"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # security_rule {
+  #   name                       = "Consul"
+  #   priority                   = 1003
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "8500"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
   # HCP Consul
   ## Create inbound rules
 
-  security_rule {
-    name                       = "ConsulServerInbound"
-    priority                   = 400
-    source_port_range          = "*"
-    source_address_prefix      = var.cidr_block
-    destination_address_prefix = "VirtualNetwork"
-    destination_port_range     = "8301"
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-  }
+  # security_rule {
+  #   name                       = "ConsulServerInbound"
+  #   priority                   = 400
+  #   source_port_range          = "*"
+  #   source_address_prefix      = var.cidr_block
+  #   destination_address_prefix = "VirtualNetwork"
+  #   destination_port_range     = "8301"
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "*"
+  # }
 
 
 
-  security_rule {
-    name                       = "ConsulClientInbound"
-    priority                   = 401
-    source_port_range          = "*"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = "VirtualNetwork"
-    destination_port_range     = "8301"
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-  }
+  # security_rule {
+  #   name                       = "ConsulClientInbound"
+  #   priority                   = 401
+  #   source_port_range          = "*"
+  #   source_address_prefix      = "VirtualNetwork"
+  #   destination_address_prefix = "VirtualNetwork"
+  #   destination_port_range     = "8301"
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "*"
+  # }
 
   ## Create outbound rules
 
 
-  security_rule {
-    name                       = "ConsulServerOutbound"
-    priority                   = 400
-    source_port_range          = "*"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = var.cidr_block
-    destination_port_range     = "8300-8301"
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-  }
+  # security_rule {
+  #   name                       = "ConsulServerOutbound"
+  #   priority                   = 400
+  #   source_port_range          = "*"
+  #   source_address_prefix      = "VirtualNetwork"
+  #   destination_address_prefix = var.cidr_block
+  #   destination_port_range     = "8300-8301"
+  #   direction                  = "Outbound"
+  #   access                     = "Allow"
+  #   protocol                   = "*"
+  # }
 
-  security_rule {
-    name                       = "ConsulClientOutbound"
-    priority                   = 401
-    source_port_range          = "*"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = "VirtualNetwork"
-    destination_port_range     = "8301"
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-  }
+  # security_rule {
+  #   name                       = "ConsulClientOutbound"
+  #   priority                   = 401
+  #   source_port_range          = "*"
+  #   source_address_prefix      = "VirtualNetwork"
+  #   destination_address_prefix = "VirtualNetwork"
+  #   destination_port_range     = "8301"
+  #   direction                  = "Outbound"
+  #   access                     = "Allow"
+  #   protocol                   = "*"
+  # }
 
-  security_rule {
-    name                       = "HTTPOutbound"
-    priority                   = 402
-    source_port_range          = "*"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = var.cidr_block
-    destination_port_range     = "80"
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-  }
+  # security_rule {
+  #   name                       = "HTTPOutbound"
+  #   priority                   = 402
+  #   source_port_range          = "*"
+  #   source_address_prefix      = "VirtualNetwork"
+  #   destination_address_prefix = var.cidr_block
+  #   destination_port_range     = "80"
+  #   direction                  = "Outbound"
+  #   access                     = "Allow"
+  #   protocol                   = "*"
+  # }
 
-  security_rule {
-    name                       = "HTTPSOutbound"
-    priority                   = 403
-    source_port_range          = "*"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = var.cidr_block
-    destination_port_range     = "443"
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-  }
+  # security_rule {
+  #   name                       = "HTTPSOutbound"
+  #   priority                   = 403
+  #   source_port_range          = "*"
+  #   source_address_prefix      = "VirtualNetwork"
+  #   destination_address_prefix = var.cidr_block
+  #   destination_port_range     = "443"
+  #   direction                  = "Outbound"
+  #   access                     = "Allow"
+  #   protocol                   = "*"
+  # }
 
-  security_rule {
-    name                       = "ConsulServerOutboundGRPC"
-    priority                   = 404
-    source_port_range          = "*"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = var.cidr_block
-    destination_port_range     = "8502"
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-  }
+  # security_rule {
+  #   name                       = "ConsulServerOutboundGRPC"
+  #   priority                   = 404
+  #   source_port_range          = "*"
+  #   source_address_prefix      = "VirtualNetwork"
+  #   destination_address_prefix = var.cidr_block
+  #   destination_port_range     = "8502"
+  #   direction                  = "Outbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  # }
 
   # HCP Vault
 
