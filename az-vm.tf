@@ -20,14 +20,6 @@ resource "azurerm_storage_account" "tf_storageaccount" {
   }
 }
 
-data "template_file" "setup" {
-  template = file("${path.module}/setup.tpl")
-
-  vars = {
-    vault_client_version = var.vault_client_version
-  }
-}
-
 # Create virtual machine
 resource "azurerm_linux_virtual_machine" "tf_vm" {
   name                  = var.vm_name
@@ -35,7 +27,7 @@ resource "azurerm_linux_virtual_machine" "tf_vm" {
   resource_group_name   = azurerm_resource_group.vault.name
   network_interface_ids = [azurerm_network_interface.tf_nic.id]
   size                  = "Standard_DS1_v2"
-  custom_data           = base64encode(data.template_file.setup.rendered)
+  custom_data           = base64encode(templatefile("${path.module}/setup.tpl", { vault_client_version = var.vault_client_version }))
   computer_name         = var.vm_name
   admin_username        = "azureuser"
 
