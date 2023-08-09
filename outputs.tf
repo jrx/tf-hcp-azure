@@ -12,3 +12,9 @@ output "vault_root_token" {
   value     = hcp_vault_cluster_admin_token.token.*.token
   sensitive = true
 }
+
+# Azure
+
+output "azurerm_resource_group" {
+  value = azurerm_resource_group.vault.name
+}
