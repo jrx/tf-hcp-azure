@@ -16,6 +16,7 @@ resource "hcp_vault_cluster" "vault_hcp" {
   cluster_id      = var.vault_cluster_id
   tier            = var.vault_tier
   public_endpoint = var.vault_public_endpoint
+  #proxy_endpoint  = var.vault_proxy_endpoint
   #min_vault_version = var.min_vault_version
   #major_version_upgrade_config {
   #  upgrade_type = "MANUAL"

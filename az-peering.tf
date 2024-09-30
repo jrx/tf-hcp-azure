@@ -40,7 +40,7 @@ resource "azurerm_public_ip" "tf_publicip" {
   name                = "ip-${random_id.name.hex}"
   location            = var.location
   resource_group_name = azurerm_resource_group.vault.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
 
   tags = {
     environment = "${var.environment}-${random_id.name.hex}"
@@ -241,9 +241,9 @@ data "hcp_azure_peering_connection" "peer" {
   hvn_link              = hcp_hvn.example_hvn.self_link
   peering_id            = hcp_azure_peering_connection.peer.peering_id
   wait_for_active_state = true
-  depends_on = [
-    azurerm_role_assignment.role_assignment
-  ]
+  #depends_on = [
+  #azurerm_role_assignment.role_assignment
+  #]
 }
 
 resource "hcp_hvn_route" "route" {
@@ -253,29 +253,31 @@ resource "hcp_hvn_route" "route" {
   target_link      = data.hcp_azure_peering_connection.peer.self_link
 }
 
-resource "azuread_service_principal" "principal" {
-  application_id = hcp_azure_peering_connection.peer.application_id
-}
+# Service Principal is created within the Doormat UI
 
-resource "azurerm_role_definition" "definition" {
-  name  = "hcp-hvn-peering-access-${random_id.name.hex}"
-  scope = azurerm_virtual_network.tf_network.id
+# resource "azuread_service_principal" "principal" {
+#   application_id = hcp_azure_peering_connection.peer.application_id
+# }
 
-  assignable_scopes = [
-    azurerm_virtual_network.tf_network.id
-  ]
+# resource "azurerm_role_definition" "definition" {
+#   name  = "hcp-hvn-peering-access-${random_id.name.hex}"
+#   scope = azurerm_virtual_network.tf_network.id
 
-  permissions {
-    actions = [
-      "Microsoft.Network/virtualNetworks/peer/action",
-      "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/read",
-      "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/write"
-    ]
-  }
-}
+#   assignable_scopes = [
+#     azurerm_virtual_network.tf_network.id
+#   ]
 
-resource "azurerm_role_assignment" "role_assignment" {
-  principal_id       = azuread_service_principal.principal.id
-  role_definition_id = azurerm_role_definition.definition.role_definition_resource_id
-  scope              = azurerm_virtual_network.tf_network.id
-}
+#   permissions {
+#     actions = [
+#       "Microsoft.Network/virtualNetworks/peer/action",
+#       "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/read",
+#       "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/write"
+#     ]
+#   }
+# }
+
+# resource "azurerm_role_assignment" "role_assignment" {
+#   principal_id       = azuread_service_principal.principal.id
+#   role_definition_id = azurerm_role_definition.definition.role_definition_resource_id
+#   scope              = azurerm_virtual_network.tf_network.id
+# }
